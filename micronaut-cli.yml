@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: com.andriyuk.backendtest
+---
+testFramework: junit
+sourceLanguage: java
