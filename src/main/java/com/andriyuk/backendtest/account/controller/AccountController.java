@@ -9,6 +9,9 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.validation.Validated;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Validated
@@ -24,7 +27,22 @@ public class AccountController implements AccountOperations {
     }
 
     @Override
-    public Account add(AccountTemplate accountTemplate) {
+    public Account getById(@NotBlank BigInteger id) {
+        return accountService.getById(id);
+    }
+
+    @Override
+    public Account add(@NotBlank AccountTemplate accountTemplate) {
         return accountService.add(accountTemplate);
+    }
+
+    @Override
+    public void close(@NotBlank BigInteger id) {
+        accountService.close(id);
+    }
+
+    @Override
+    public Account withdraw(BigInteger id, BigDecimal amount) {
+        return accountService.withdraw(id, amount);
     }
 }

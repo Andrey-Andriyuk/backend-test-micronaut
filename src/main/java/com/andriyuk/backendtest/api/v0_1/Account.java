@@ -3,6 +3,7 @@ package com.andriyuk.backendtest.api.v0_1;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.validation.Validated;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +13,8 @@ import java.math.BigInteger;
 @Immutable
 @Validated
 public class Account extends AccountTemplate {
+
+    public static final byte IBAN_MAX_ACCOUNT_NUMBER_LENGTH = 34;
 
     protected BigInteger id;
     protected AccountState state;
@@ -33,5 +36,11 @@ public class Account extends AccountTemplate {
     @NotBlank
     public AccountState getState() {
         return state;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        //Checking accounts for equality involves all Account object fields
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 }

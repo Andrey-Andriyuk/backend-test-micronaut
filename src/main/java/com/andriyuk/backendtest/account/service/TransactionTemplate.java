@@ -12,7 +12,11 @@ public class TransactionTemplate {
     @Inject
     private DSLContext dsl;
 
-    public <T> T execute(TransactionCallback<T> action) {
+    public <T> T executeResult(TransactionResultCallback<T> action) {
         return dsl.transactionResult(configuration -> action.doInTransaction(DSL.using(configuration)));
+    }
+
+    public void execute(TransactionCallback action) {
+        dsl.transaction(configuration -> action.doInTransaction(DSL.using(configuration)));
     }
 }
