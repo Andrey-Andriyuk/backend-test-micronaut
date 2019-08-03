@@ -18,6 +18,7 @@ public class AccountServiceTest {
     @Inject
     AccountService accountService;
 
+    @MicronautTest
     @Test
     public void addTest() {
         assertThrows(IllegalArgumentException.class,
@@ -38,6 +39,7 @@ public class AccountServiceTest {
         assertEquals(createdAccount.getState(), AccountState.OPENED, "Created account should be in OPENED state.");
     }
 
+    @MicronautTest
     @Test
     public void getByInvalidIdTest() {
         assertThrows(IllegalArgumentException.class,
@@ -46,6 +48,7 @@ public class AccountServiceTest {
                 "Client shouldn't be able to query non existent account.");
     }
 
+    @MicronautTest
     @Test
     public void closeTest() {
         Account closingAccount = accountService.add(getRandomAccountTemplate(BigDecimal.ZERO));
@@ -72,6 +75,7 @@ public class AccountServiceTest {
                 "Client shouldn't be able to close non empty account.");
     }
 
+    @MicronautTest
     @Test
     public void depositTest() {
         Account invalidAccount = accountService.add(getRandomAccountTemplate(BigDecimal.ZERO));
@@ -98,6 +102,7 @@ public class AccountServiceTest {
                 "Rest accounts should remain unchanged.");
     }
 
+    @MicronautTest
     @Test
     public void withdrawTest() {
         Account invalidAccount = accountService.add(getRandomAccountTemplate(BigDecimal.ZERO));
@@ -129,6 +134,7 @@ public class AccountServiceTest {
                 "Rest accounts should remain unchanged.");
     }
 
+    @MicronautTest
     @Test
     public void transferTest() {
         BigDecimal transferAmount = getRandomBigDecimal();

@@ -10,13 +10,23 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * Account domian model
+ */
 @Immutable
 @Validated
 public class Account extends AccountTemplate {
 
     public static final byte IBAN_MAX_ACCOUNT_NUMBER_LENGTH = 34;
 
+    /**
+     * Account id
+     */
     protected BigInteger id;
+
+    /**
+     * Account state
+     */
     protected AccountState state;
 
     @JsonCreator

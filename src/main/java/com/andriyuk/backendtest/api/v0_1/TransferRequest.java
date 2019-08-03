@@ -9,13 +9,26 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-//todo JavaDoc
+/**
+ * Domain model of request for money transfer
+ */
 @Immutable
 @Validated
 public class TransferRequest {
 
+    /**
+     * Source account id
+     */
     private BigInteger sourceAccountId;
+
+    /**
+     * Destination account id
+     */
     private BigInteger destinationAccountId;
+
+    /**
+     * Transfer amount
+     */
     private BigDecimal amount;
 
     @JsonCreator

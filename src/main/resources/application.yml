@@ -27,3 +27,6 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger-ui
         mapping: /swagger-ui/**
+      javadoc:
+        paths: file:./build/docs/javadoc/
+        mapping: /javadoc/**

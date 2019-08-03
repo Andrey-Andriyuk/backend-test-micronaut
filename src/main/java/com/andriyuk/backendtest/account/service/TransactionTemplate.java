@@ -6,6 +6,9 @@ import org.jooq.impl.DSL;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Transaction template for executing operations withing transaction
+ */
 @Singleton
 public class TransactionTemplate {
 
@@ -14,9 +17,5 @@ public class TransactionTemplate {
 
     public <T> T executeResult(TransactionResultCallback<T> action) {
         return dsl.transactionResult(configuration -> action.doInTransaction(DSL.using(configuration)));
-    }
-
-    public void execute(TransactionCallback action) {
-        dsl.transaction(configuration -> action.doInTransaction(DSL.using(configuration)));
     }
 }

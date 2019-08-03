@@ -11,13 +11,31 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * Account domain template model
+ */
 @Immutable
 @Validated
 public class AccountTemplate {
 
+    /**
+     * User id
+     */
     protected BigInteger userId;
+
+    /**
+     * Account number
+     */
     protected String number;
+
+    /**
+     * Initial account balance
+     */
     protected BigDecimal balance;
+
+    /**
+     * Account currency
+     */
     protected Currency currency;
 
     @JsonCreator

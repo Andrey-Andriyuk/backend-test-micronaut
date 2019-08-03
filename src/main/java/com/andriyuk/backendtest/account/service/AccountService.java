@@ -10,32 +10,52 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
-//todo JavaDoc
+/**
+ * Domain service of accounts
+ */
 @Singleton
 public class AccountService {
 
+    //Using custom transaction template implementation, since Spring is prohibited
     @Inject
     private TransactionTemplate transaction;
 
     @Inject
     private AccountDao accountDao;
 
-    //todo JavaDoc
+    /**
+     * Returns list of all accounts
+     * @return list of account models
+     */
     public List<Account> getList() {
         return transaction.executeResult(transactionContext -> getList(transactionContext));
     }
 
-    //todo JavaDoc
+    /**
+     * Requests list of all accounts within specified transaction
+     * @param transactionContext    transaction context
+     * @return                      list of account models
+     */
     protected List<Account> getList(DSLContext transactionContext) {
         return accountDao.getList(transactionContext);
     }
 
-    //todo JavaDoc
+    /**
+     * Returns account by specified id
+     * @param id    account id
+     * @return      account model
+     */
     public Account getById(BigInteger id) {
         return transaction.executeResult(transactionContext -> getById(transactionContext, id));
     }
 
-    //todo JavaDoc
+    /**
+     * Requests account by specified id within specified transaction
+     * @param transactionContext    transaction context
+     * @param id                    account id
+     * @return                      account model
+     * @throws                      IllegalArgumentException in case of invalid account id
+     */
     protected Account getById(DSLContext transactionContext, BigInteger id) {
         Account result = accountDao.getById(transactionContext, id);
         if (result == null) {
@@ -45,7 +65,11 @@ public class AccountService {
         return result;
     }
 
-    //todo JavaDoc
+    /**
+     * Adds a new open account by template
+     * @param accountTemplate   template of account to add
+     * @return                  added account model
+     */
     public Account add(AccountTemplate accountTemplate) {
         return transaction.executeResult(transactionContext -> {
             checkAccountTemplate(accountTemplate);
@@ -53,7 +77,11 @@ public class AccountService {
         });
     }
 
-    //todo JavaDoc
+    /**
+     * Perform basic validation of account template
+     * @param accountTemplate   account template
+     * @throws                  IllegalArgumentException in case of invalid account number
+     */
     public void checkAccountTemplate(AccountTemplate accountTemplate) {
         if (accountTemplate.getNumber().length() > Account.IBAN_MAX_ACCOUNT_NUMBER_LENGTH) {
             throw new IllegalArgumentException(String.format("Account number length(%d) doesn't fit IBAN restrictions",
@@ -63,8 +91,12 @@ public class AccountService {
         checkAmountNonNegative(accountTemplate.getBalance());
     }
 
-    //todo JavaDoc
-    //todo Возвращать измененный объект
+    /**
+     * Close account by specified id
+     * @param id        account id
+     * @return          closed account model
+     * @throws          IllegalStateException in case of invalid account state
+     */
     public Account close(BigInteger id) {
         return transaction.executeResult(transactionContext -> {
             Account account = getById(id);
@@ -78,27 +110,50 @@ public class AccountService {
         });
     }
 
-    //todo JavaDoc
+    /**
+     * Deposits specified amount of money from specified account
+     * @param id        account id
+     * @param amount    amount to deposit
+     * @return          model of modified account
+     */
     public Account deposit(BigInteger id, BigDecimal amount) {
         return transaction.executeResult(transactionContext -> deposit(transactionContext, id, amount));
     }
 
-    //todo JavaDoc
-    public Account deposit(DSLContext transactionContext, BigInteger id, BigDecimal amount) {
+    /**
+     * Deposits specified amount of money from specified account within specified transaction
+     * @param transactionContext    transaction context
+     * @param id                    account id
+     * @param amount                amount to deposit
+     * @return                      model of modified account
+     */
+    protected Account deposit(DSLContext transactionContext, BigInteger id, BigDecimal amount) {
         Account account = getById(transactionContext, id);
-        checkBalanceOperation(account, amount);
+        checkBalanceState(account, amount);
         return accountDao.changeBalance(transactionContext, id, amount);
     }
 
-    //todo JavaDoc
+    /**
+     * Withdraws specified amount of money from specified account
+     * @param id        account id
+     * @param amount    amount to withdraw
+     * @return          model of modified account
+     */
     public Account withdraw(BigInteger id, BigDecimal amount) {
         return transaction.executeResult(transactionContext -> withdraw(transactionContext, id, amount));
     }
 
-    //todo JavaDoc
+    /**
+     * Withdraws specified amount of money from specified account within specified transaction
+     * @param transactionContext    transaction context
+     * @param id                    account id
+     * @param amount                amount to withdraw
+     * @return                      model of modified account
+     * @throws                      IllegalArgumentException in case of insufficient account balance
+     */
     protected Account withdraw(DSLContext transactionContext, BigInteger id, BigDecimal amount) {
         Account account = getById(transactionContext, id);
-        checkBalanceOperation(account, amount);
+        checkBalanceState(account, amount);
 
         if (account.getBalance().compareTo(amount) < 0) {
             throw new IllegalArgumentException(String.format(
@@ -109,7 +164,12 @@ public class AccountService {
         return accountDao.changeBalance(transactionContext, id, amount.negate());
     }
 
-    //todo JavaDoc
+    /**
+     * Transfer specified amount of money from one account to another
+     * @param request           request model for money transfer
+     * @return                  result model of money transfer
+     * @throws                  IllegalArgumentException in case of different accounts currencies
+     */
     public TransferResult transfer(TransferRequest request) {//BigInteger sourceAccountId, BigInteger destinationAccountId, BigDecimal amount) {
         return transaction.executeResult(transactionContext -> {
             Account sourceAccount = withdraw(transactionContext, request.getSourceAccountId(), request.getAmount());
@@ -126,8 +186,13 @@ public class AccountService {
         });
     }
 
-    //todo JavaDoc
-    public void checkBalanceOperation(Account account, BigDecimal amount) {
+    /**
+     * Checks if account is in OPENED state. Checks is specified amount is valid
+     * @param account       account model
+     * @param amount        money amount
+     * @throws              IllegalArgumentException in case of check failure
+     */
+    public void checkBalanceState(Account account, BigDecimal amount) {
         if (account.getState() == AccountState.CLOSED) {
             throw new IllegalStateException(String.format(
                     "Unable to perform balance operation on closed account with id: %d", account.getId()));
@@ -136,14 +201,22 @@ public class AccountService {
         checkAmountPositive(amount);
     }
 
-    //todo JavaDoc
+    /**
+     * Checks is specified amount is positive
+     * @param amount    money amount
+     * @throws          IllegalArgumentException in case of check failure
+     */
     protected void checkAmountPositive(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Unable to perform balance operation with non positive amount");
         }
     }
 
-    //todo JavaDoc
+    /**
+     * Checks is specified amount is not negative
+     * @param amount    money amount
+     * @throws          IllegalArgumentException in case of check failure
+     */
     protected void checkAmountNonNegative(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Unable to perform balance operation with negative amount");

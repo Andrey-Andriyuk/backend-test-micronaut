@@ -7,12 +7,21 @@ import io.micronaut.validation.Validated;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotBlank;
 
-//todo JavaDoc
+/**
+ * Domain model of money transfer result
+ */
 @Immutable
 @Validated
 public class TransferResult {
 
+    /**
+     * Domain model of modified source account
+     */
     private Account sourceAccount;
+
+    /**
+     * Domain model of modified destination account
+     */
     private Account destinationAccount;
 
     @JsonCreator
