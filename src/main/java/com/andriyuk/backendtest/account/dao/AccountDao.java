@@ -10,6 +10,7 @@ import org.jooq.Record;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -19,21 +20,14 @@ import static com.andriyuk.backendtest.db.jooq.Tables.ACCOUNT;
 @Singleton
 public class AccountDao {
 
-    @Inject
-    private DSLContext context;
-
-    public AccountDao(DSLContext context) {
-        this.context = context;
+    //todo JavaDoc
+    public List<Account> getList(DSLContext transactionContext) {
+        return transactionContext.selectFrom(ACCOUNT).fetch().map(AccountDao::createAccountFromRecord);
     }
 
     //todo JavaDoc
-    public List<Account> getList() {
-        return context.selectFrom(ACCOUNT).fetch().map(AccountDao::createAccountFromRecord);
-    }
-
-    //todo JavaDoc
-    public Account getById(BigInteger id) {
-        return context.selectFrom(ACCOUNT)
+    public Account getById(DSLContext transactionContext, BigInteger id) {
+        return transactionContext.selectFrom(ACCOUNT)
                 .where(ACCOUNT.ID.eq(id)).fetchOne(AccountDao::createAccountFromRecord);
     }
 
@@ -47,8 +41,17 @@ public class AccountDao {
     }
 
     //todo JavaDoc
-    public void changeState(DSLContext transactionContext, BigInteger id, AccountState state) {
+    public Account changeBalance(DSLContext transactionContext, BigInteger id, BigDecimal amount) {
+        transactionContext.update(ACCOUNT).set(ACCOUNT.BALANCE, ACCOUNT.BALANCE.add(amount)).where(ACCOUNT.ID.eq(id)).execute();
+        // Since H2 does not support the UPDATE ... RETURNING statement, a modified account is requested here (in the context of a transaction)
+        return getById(transactionContext, id);
+    }
+
+    //todo JavaDoc
+    public Account changeState(DSLContext transactionContext, BigInteger id, AccountState state) {
         transactionContext.update(ACCOUNT).set(ACCOUNT.STATE, state.toString()).where(ACCOUNT.ID.eq(id)).execute();
+        // Since H2 does not support the UPDATE ... RETURNING statement, a modified account is requested here (in the context of a transaction)
+        return getById(transactionContext, id);
     }
 
     //todo JavaDoc

@@ -1,10 +1,8 @@
 package com.andriyuk.backendtest.account.controller;
 
-import com.andriyuk.backendtest.api.v0_1.Account;
-import com.andriyuk.backendtest.api.v0_1.AccountOperations;
+import com.andriyuk.backendtest.api.v0_1.*;
 import com.andriyuk.backendtest.account.service.AccountService;
 
-import com.andriyuk.backendtest.api.v0_1.AccountTemplate;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.validation.Validated;
 
@@ -37,12 +35,22 @@ public class AccountController implements AccountOperations {
     }
 
     @Override
-    public void close(@NotBlank BigInteger id) {
-        accountService.close(id);
+    public Account close(@NotBlank BigInteger id) {
+        return accountService.close(id);
     }
 
     @Override
     public Account withdraw(BigInteger id, BigDecimal amount) {
         return accountService.withdraw(id, amount);
+    }
+
+    @Override
+    public Account deposit(BigInteger id, BigDecimal amount) {
+        return accountService.deposit(id, amount);
+    }
+
+    @Override
+    public TransferResult transfer(TransferRequest transferRequest) {
+        return accountService.transfer(transferRequest);
     }
 }

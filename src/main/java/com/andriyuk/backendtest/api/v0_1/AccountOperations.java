@@ -31,12 +31,22 @@ public interface AccountOperations {
     @Operation(summary = "Adds a new open account by template")
     Account add(@Parameter(description = "Template for account being adding") AccountTemplate accountTemplate);
 
-    @Post(uri = "/close/{id}", consumes = MediaType.TEXT_PLAIN)
+    @Post(uri = "/close/{id}", consumes = MediaType.TEXT_PLAIN, processes = MediaType.APPLICATION_JSON)
     @Operation(summary = "Closes account by specified id")
-    void close(@Parameter(description = "Account ID") BigInteger id);
+    Account close(@Parameter(description = "Account ID") BigInteger id);
 
     @Post(uri = "/{id}/withdraw/{amount}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.APPLICATION_JSON)
     @Operation(summary = "Withdraws specified amount of money from specified account")
     Account withdraw(@Parameter(description = "Account ID") BigInteger id,
                      @Parameter(description = "Amount of money") BigDecimal amount);
+
+    @Post(uri = "/{id}/deposit/{amount}", consumes = MediaType.TEXT_PLAIN, produces = MediaType.APPLICATION_JSON)
+    @Operation(summary = "Deposits specified amount of money from specified account")
+    Account deposit(@Parameter(description = "Account ID") BigInteger id,
+                     @Parameter(description = "Amount of money") BigDecimal amount);
+
+
+    @Post(uri = "/transfer", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+    @Operation(summary = "Transfer specified amount of money from one account to another")
+    TransferResult transfer(@Parameter(description = "Request for money transfer") TransferRequest transferRequest);
 }
