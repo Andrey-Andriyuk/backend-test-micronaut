@@ -32,8 +32,8 @@ public class Account extends AccountTemplate {
     @JsonCreator
     public Account(@JsonProperty("id") BigInteger id, @JsonProperty("userId") BigInteger userId,
                    @JsonProperty("number") String number, @JsonProperty("balance") BigDecimal balance,
-                   @JsonProperty("currency") Currency currency, @JsonProperty("state") AccountState state) {
-        super(userId, number, balance, currency);
+                   @JsonProperty("currencyCode") CurrencyCode currencyCode, @JsonProperty("state") AccountState state) {
+        super(userId, number, balance, currencyCode);
         this.id = id;
         this.state = state;
     }

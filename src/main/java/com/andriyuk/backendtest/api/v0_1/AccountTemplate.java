@@ -34,18 +34,18 @@ public class AccountTemplate {
     protected BigDecimal balance;
 
     /**
-     * Account currency
+     * Account currencyCode
      */
-    protected Currency currency;
+    protected CurrencyCode currencyCode;
 
     @JsonCreator
     public AccountTemplate(@JsonProperty("userId") BigInteger userId,
                    @JsonProperty("number") String number, @JsonProperty("balance") BigDecimal balance,
-                   @JsonProperty("currency") Currency currency) {
+                   @JsonProperty("currencyCode") CurrencyCode currencyCode) {
         this.userId = userId;
         this.number = number;
         this.balance = balance;
-        this.currency = currency;
+        this.currencyCode = currencyCode;
     }
 
     @NotBlank
@@ -64,8 +64,8 @@ public class AccountTemplate {
     }
 
     @NotBlank
-    public Currency getCurrency() {
-        return currency;
+    public CurrencyCode getCurrencyCode() {
+        return currencyCode;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class AccountTemplate {
                 .append(this.getUserId(), that.getUserId())
                 .append(this.getNumber(), that.getNumber())
                 .append(this.getBalance(), that.getBalance())
-                .append(this.getCurrency(), that.getCurrency())
+                .append(this.getCurrencyCode(), that.getCurrencyCode())
                 .build();
     }
 

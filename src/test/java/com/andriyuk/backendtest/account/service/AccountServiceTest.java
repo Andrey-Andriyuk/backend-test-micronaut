@@ -138,8 +138,8 @@ public class AccountServiceTest {
     @Test
     public void transferTest() {
         BigDecimal transferAmount = getRandomBigDecimal();
-        Account sourceAccount = accountService.add(getRandomAccountTemplate(transferAmount, Currency.EUR));
-        Account destinationAccount = accountService.add(getRandomAccountTemplate(getRandomBigDecimal(), Currency.EUR));
+        Account sourceAccount = accountService.add(getRandomAccountTemplate(transferAmount, CurrencyCode.EUR));
+        Account destinationAccount = accountService.add(getRandomAccountTemplate(getRandomBigDecimal(), CurrencyCode.EUR));
         Account otherAccount = accountService.add(getRandomAccountTemplate());
 
         assertThrows(IllegalArgumentException.class,
@@ -166,7 +166,7 @@ public class AccountServiceTest {
                 () -> accountService.transfer(new TransferRequest(sourceAccount.getId(), destinationAccount.getId(), transferAmount.multiply(BigDecimal.TEN))),
                 "Client shouldn't be able to transfer extra money.");
 
-        Account differentCurrencyAccount = accountService.add(getRandomAccountTemplate(getRandomBigDecimal(), Currency.USD));
+        Account differentCurrencyAccount = accountService.add(getRandomAccountTemplate(getRandomBigDecimal(), CurrencyCode.USD));
         assertThrows(IllegalArgumentException.class,
                 () -> accountService.transfer(new TransferRequest(sourceAccount.getId(), differentCurrencyAccount.getId(), transferAmount)),
                 "Client shouldn't be able to transfer money between accounts with different currencies.");
@@ -202,17 +202,17 @@ public class AccountServiceTest {
     }
 
     private AccountTemplate getRandomAccountTemplate(String number) {
-        return new AccountTemplate(getRandomBigInteger(), number, getRandomBigDecimal(), Currency.getRandom());
+        return new AccountTemplate(getRandomBigInteger(), number, getRandomBigDecimal(), CurrencyCode.getRandom());
     }
 
     private AccountTemplate getRandomAccountTemplate(BigDecimal balance) {
-        return getRandomAccountTemplate(balance, Currency.getRandom());
+        return getRandomAccountTemplate(balance, CurrencyCode.getRandom());
     }
 
-    private AccountTemplate getRandomAccountTemplate(BigDecimal balance, Currency currency) {
+    private AccountTemplate getRandomAccountTemplate(BigDecimal balance, CurrencyCode currencyCode) {
         return new AccountTemplate(getRandomBigInteger(),
                 RandomStringUtils.random(Account.IBAN_MAX_ACCOUNT_NUMBER_LENGTH, true, true),
-                balance, currency);
+                balance, currencyCode);
     }
     private AccountTemplate getRandomAccountTemplate() {
         return getRandomAccountTemplate(getRandomBigDecimal());

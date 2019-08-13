@@ -3,18 +3,18 @@ package com.andriyuk.backendtest.api.v0_1;
 import java.util.Random;
 
 /**
- * Currency model
+ * CurrencyCode model
  */
-public enum  Currency {
+public enum CurrencyCode {
     USD,
     EUR,
     RUR; //..etc
 
     /**
-     * Returns random currency
-     * @return currency
+     * Returns random currencyCode
+     * @return currencyCode
      */
-    public static Currency getRandom() {
+    public static CurrencyCode getRandom() {
         return  values()[(new Random()).nextInt(values().length)];
     }
 }

@@ -71,6 +71,7 @@ public class AccountService {
      * @return                  added account model
      */
     public Account add(AccountTemplate accountTemplate) {
+        //todo запрещать добавлять счета с номерами из системного списка(SYSTEM-COMMISSION, ...)
         return transaction.executeResult(transactionContext -> {
             checkAccountTemplate(accountTemplate);
             return accountDao.add(transactionContext, accountTemplate, AccountState.OPENED);
@@ -175,11 +176,11 @@ public class AccountService {
             Account sourceAccount = withdraw(transactionContext, request.getSourceAccountId(), request.getAmount());
             Account destinationAccount = deposit(transactionContext, request.getDestinationAccountId(), request.getAmount());
 
-            if (!sourceAccount.getCurrency().equals(destinationAccount.getCurrency())) {
+            if (!sourceAccount.getCurrencyCode().equals(destinationAccount.getCurrencyCode())) {
                 throw new IllegalArgumentException(String.format(
                         "Unable to transfer money between accounts with id %d and %d since they have different " +
                                 "currencies (%s and %s respectively).", sourceAccount.getId(), destinationAccount.getId(),
-                        sourceAccount.getCurrency().toString(), destinationAccount.getCurrency().toString()));
+                        sourceAccount.getCurrencyCode().toString(), destinationAccount.getCurrencyCode().toString()));
             }
 
             return new TransferResult(sourceAccount, destinationAccount);
