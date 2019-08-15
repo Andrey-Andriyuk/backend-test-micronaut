@@ -1,1 +1,6 @@
-rootProject.name="account"
+rootProject.name = "micro-bank"
+
+include("account-service")
+
+project(":account-service").projectDir="$rootDir/account/account-service" as File
+
