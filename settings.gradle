@@ -1,6 +1,8 @@
 rootProject.name = "micro-bank"
 
 include("account-service")
+include("account-db")
 
 project(":account-service").projectDir="$rootDir/account/account-service" as File
+project(":account-db").projectDir="$rootDir/account/account-db" as File
 
