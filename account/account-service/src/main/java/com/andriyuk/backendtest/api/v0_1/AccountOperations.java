@@ -1,16 +1,12 @@
 package com.andriyuk.backendtest.api.v0_1;
 
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.*;
 import io.micronaut.validation.Validated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
-//todo Выделить API в отдельный проект
-import javax.validation.constraints.NotBlank;
+//todo Move API to separate project
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -19,6 +15,7 @@ import java.util.List;
  * Account service API
  */
 @Validated
+@Controller("/v0_1")
 public interface AccountOperations {
 
     /**

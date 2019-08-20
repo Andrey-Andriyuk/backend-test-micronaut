@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.account.service;
+package com.andriyuk.backendtest.account.v0_1.service;
 
 import com.andriyuk.backendtest.api.v0_1.Account;
 import com.andriyuk.backendtest.api.v0_1.TransferRequest;
@@ -11,15 +11,15 @@ import java.util.concurrent.CountDownLatch;
  * Modified Account service for concurrency test
  */
 @Singleton
-public class ConcurrentAccountService extends AccountService {
+public class ConcurrencyTestAccountService extends AccountService {
 
     /**
-     * Test modification of original transfer method: does withdrawing and when waits for another thread to do it's job.
+     * Test modification of original transfer method: does withdrawing and when waits for another thread to do complete transfer operation
      * After that does the rest of transfer(depositing).
      * @param request   transfer request
      */
-    public TransferResult transferWithdrawAndWait(TransferRequest request, CountDownLatch transferLatch,
-                                                  CountDownLatch resultLatch) {
+    public TransferResult withdrawWaitAndDeposit(TransferRequest request, CountDownLatch transferLatch,
+                                                 CountDownLatch resultLatch) {
         return transaction.executeResult(transactionContext -> {
             try {
                 Account sourceAccount = withdraw(transactionContext, request.getSourceAccountId(), request.getAmount());
@@ -50,8 +50,8 @@ public class ConcurrentAccountService extends AccountService {
      * does another complete transfer operation.
      * @param request   transfer request
      */
-    public TransferResult transferWaitForWithdraw(TransferRequest request, CountDownLatch transferLatch,
-                                                  CountDownLatch resultLatch) {
+    public TransferResult waitForWithdrawAndTransfer(TransferRequest request, CountDownLatch transferLatch,
+                                                     CountDownLatch resultLatch) {
         try {
             try {
                 transferLatch.await(); //Waits for another thread to do withdraw

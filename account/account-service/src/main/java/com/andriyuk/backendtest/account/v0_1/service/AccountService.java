@@ -1,6 +1,6 @@
-package com.andriyuk.backendtest.account.service;
+package com.andriyuk.backendtest.account.v0_1.service;
 
-import com.andriyuk.backendtest.account.dao.AccountDao;
+import com.andriyuk.backendtest.account.v0_1.dao.AccountDao;
 import com.andriyuk.backendtest.api.v0_1.*;
 import org.jooq.DSLContext;
 

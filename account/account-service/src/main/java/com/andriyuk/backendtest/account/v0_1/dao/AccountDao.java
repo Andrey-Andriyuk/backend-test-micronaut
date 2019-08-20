@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.account.dao;
+package com.andriyuk.backendtest.account.v0_1.dao;
 
 import com.andriyuk.backendtest.api.v0_1.Account;
 import com.andriyuk.backendtest.api.v0_1.AccountState;
@@ -8,7 +8,6 @@ import com.andriyuk.backendtest.db.jooq.tables.records.AccountRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.math.BigInteger;

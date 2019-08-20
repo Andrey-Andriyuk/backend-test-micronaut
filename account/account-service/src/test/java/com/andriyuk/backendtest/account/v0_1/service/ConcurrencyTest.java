@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.account.service;
+package com.andriyuk.backendtest.account.v0_1.service;
 
 import com.andriyuk.backendtest.api.v0_1.Account;
 import com.andriyuk.backendtest.api.v0_1.Currency;
@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ConcurrencyTest extends AccountServiceTest {
 
     @Inject
-    ConcurrentAccountService accountService;
+    ConcurrencyTestAccountService accountService;
 
-    private Executor executor = (runnable -> new Thread(runnable).start());
+    private Executor simpleExecutor = (runnable -> new Thread(runnable).start());
 
     @MicronautTest
     @Test
@@ -36,8 +36,8 @@ public class ConcurrencyTest extends AccountServiceTest {
 
         TransferRequest request = new TransferRequest(sourceAccount.getId(), destinationAccount.getId(), transferAmount);
         //Do parallel transfer operations
-        executor.execute(() -> accountService.transferWaitForWithdraw(request, transferLatch, resultLatch));
-        executor.execute(() -> accountService.transferWithdrawAndWait(request, transferLatch, resultLatch));
+        simpleExecutor.execute(() -> accountService.waitForWithdrawAndTransfer(request, transferLatch, resultLatch));
+        simpleExecutor.execute(() -> accountService.withdrawWaitAndDeposit(request, transferLatch, resultLatch));
 
         resultLatch.await(); //Wait until both parallel transfer operations are completed
 

@@ -1,7 +1,7 @@
-package com.andriyuk.backendtest.account.controller;
+package com.andriyuk.backendtest.account.v0_1.controller;
 
 import com.andriyuk.backendtest.api.v0_1.*;
-import com.andriyuk.backendtest.account.service.AccountService;
+import com.andriyuk.backendtest.account.v0_1.service.AccountService;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.validation.Validated;
@@ -16,7 +16,6 @@ import java.util.List;
  * Implementation of account service API
  */
 @Validated
-@Controller("/")
 public class AccountController implements AccountOperations {
 
     @Inject
