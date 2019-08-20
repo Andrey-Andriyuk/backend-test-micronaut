@@ -38,7 +38,7 @@ public class AccountDao {
      */
     public Account getById(DSLContext transactionContext, BigInteger id) {
         return transactionContext.selectFrom(ACCOUNT)
-                .where(ACCOUNT.ID.eq(id)).fetchOne(AccountDao::createAccountFromRecord);
+                .where(ACCOUNT.ID.eq(id)).forUpdate().fetchOne(AccountDao::createAccountFromRecord);
     }
 
     /**

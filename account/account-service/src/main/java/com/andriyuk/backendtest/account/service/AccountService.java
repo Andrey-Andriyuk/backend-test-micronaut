@@ -18,10 +18,10 @@ public class AccountService {
 
     //Using custom transaction template implementation, since Spring is prohibited
     @Inject
-    private TransactionTemplate transaction;
+    protected TransactionTemplate transaction;
 
     @Inject
-    private AccountDao accountDao;
+    protected AccountDao accountDao;
 
     /**
      * Returns list of all accounts
@@ -170,7 +170,7 @@ public class AccountService {
      * @return                  result model of money transfer
      * @throws                  IllegalArgumentException in case of different accounts currencies
      */
-    public TransferResult transfer(TransferRequest request) {//BigInteger sourceAccountId, BigInteger destinationAccountId, BigDecimal amount) {
+    public TransferResult transfer(TransferRequest request) {
         return transaction.executeResult(transactionContext -> {
             Account sourceAccount = withdraw(transactionContext, request.getSourceAccountId(), request.getAmount());
             Account destinationAccount = deposit(transactionContext, request.getDestinationAccountId(), request.getAmount());

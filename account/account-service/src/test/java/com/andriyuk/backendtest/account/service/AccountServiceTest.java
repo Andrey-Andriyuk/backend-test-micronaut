@@ -197,7 +197,7 @@ public class AccountServiceTest {
         return new BigInteger(32, new Random());
     }
 
-    private BigDecimal getRandomBigDecimal() {
+    protected BigDecimal getRandomBigDecimal() {
         return new BigDecimal(Math.abs(Math.random()) * 100000);
     }
 
@@ -209,7 +209,7 @@ public class AccountServiceTest {
         return getRandomAccountTemplate(balance, Currency.getRandom());
     }
 
-    private AccountTemplate getRandomAccountTemplate(BigDecimal balance, Currency currency) {
+    protected AccountTemplate getRandomAccountTemplate(BigDecimal balance, Currency currency) {
         return new AccountTemplate(getRandomBigInteger(),
                 RandomStringUtils.random(Account.IBAN_MAX_ACCOUNT_NUMBER_LENGTH, true, true),
                 balance, currency);
