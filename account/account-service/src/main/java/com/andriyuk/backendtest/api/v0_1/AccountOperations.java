@@ -40,7 +40,7 @@ public interface AccountOperations {
      * @param accountTemplate   template of account to add
      * @return                  added account model
      */
-    @Put(consumes = MediaType.APPLICATION_JSON, processes = MediaType.APPLICATION_JSON)
+    @Post(consumes = MediaType.APPLICATION_JSON, processes = MediaType.APPLICATION_JSON)
     @Operation(summary = "Adds a new open account by template")
     Account add(@Parameter(description = "Template for account being adding") AccountTemplate accountTemplate);
 
@@ -49,7 +49,7 @@ public interface AccountOperations {
      * @param id        account id
      * @return          closed   account model
      */
-    @Post(uri = "/close/{id}", consumes = MediaType.TEXT_PLAIN, processes = MediaType.APPLICATION_JSON)
+    @Put(uri = "/close/{id}", consumes = MediaType.TEXT_PLAIN, processes = MediaType.APPLICATION_JSON)
     @Operation(summary = "Close account by specified id")
     Account close(@Parameter(description = "Account ID") BigInteger id);
 
