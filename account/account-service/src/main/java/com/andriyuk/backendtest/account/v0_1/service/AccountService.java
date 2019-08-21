@@ -1,7 +1,10 @@
 package com.andriyuk.backendtest.account.v0_1.service;
 
 import com.andriyuk.backendtest.account.v0_1.dao.AccountDao;
-import com.andriyuk.backendtest.api.v0_1.*;
+import com.andriyuk.backendtest.account.v0_1.service.transaction.TransactionTemplate;
+import com.andriyuk.backendtest.api.v0_1.account.Account;
+import com.andriyuk.backendtest.api.v0_1.account.AccountState;
+import com.andriyuk.backendtest.api.v0_1.account.AccountTemplate;
 import org.jooq.DSLContext;
 
 import javax.inject.Inject;
@@ -11,7 +14,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Domain service of accounts
+ * Account service
  */
 @Singleton
 public class AccountService {
@@ -42,11 +45,11 @@ public class AccountService {
 
     /**
      * Returns account by specified id
-     * @param id    account id
-     * @return      account model
+     * @param accountId    account id
+     * @return             account model
      */
-    public Account getById(BigInteger id) {
-        return transaction.executeResult(transactionContext -> getById(transactionContext, id));
+    public Account getById(BigInteger accountId) {
+        return transaction.executeResult(transactionContext -> getById(transactionContext, accountId));
     }
 
     /**
@@ -66,11 +69,11 @@ public class AccountService {
     }
 
     /**
-     * Adds a new open account by template
-     * @param accountTemplate   template of account to add
+     * Creates a new create account by template
+     * @param accountTemplate   template of account to create
      * @return                  added account model
      */
-    public Account add(AccountTemplate accountTemplate) {
+    public Account create(AccountTemplate accountTemplate) {
         return transaction.executeResult(transactionContext -> {
             checkAccountTemplate(accountTemplate);
             return accountDao.add(transactionContext, accountTemplate, AccountState.OPENED);
@@ -92,97 +95,20 @@ public class AccountService {
     }
 
     /**
-     * Close account by specified id
-     * @param id        account id
-     * @return          closed account model
-     * @throws          IllegalStateException in case of invalid account state
+     * Close specified account
+     * @param accountId             account id
+     * @throws                 IllegalStateException in case of invalid account state or if account is already changed
      */
-    public Account close(BigInteger id) {
-        return transaction.executeResult(transactionContext -> {
-            Account account = getById(id);
-            if (account.getState() == AccountState.CLOSED) {
-                throw new IllegalStateException(String.format("Account with id %d is already closed.", id));
-            } else if (!account.getBalance().equals(BigDecimal.ZERO)) {
-                throw new IllegalStateException(String.format("Closing non empty account with id %d is prohibited.", id));
+    public void close(BigInteger accountId) throws IllegalStateException {
+        transaction.execute(transactionContext -> {
+            Account actualAccount = getById(accountId);
+            if (actualAccount.getState() == AccountState.CLOSED) {
+                throw new IllegalStateException(String.format("Account with id %d is already closed.", actualAccount.getId()));
+            } else if (!actualAccount.getBalance().equals(BigDecimal.ZERO)) {
+                throw new IllegalStateException(String.format("Closing non empty account with id %d is prohibited.", actualAccount.getId()));
             }
 
-            return accountDao.changeState(transactionContext, id, AccountState.CLOSED);
-        });
-    }
-
-    /**
-     * Deposits specified amount of money from specified account
-     * @param id        account id
-     * @param amount    amount to deposit
-     * @return          model of modified account
-     */
-    public Account deposit(BigInteger id, BigDecimal amount) {
-        return transaction.executeResult(transactionContext -> deposit(transactionContext, id, amount));
-    }
-
-    /**
-     * Deposits specified amount of money from specified account within specified transaction
-     * @param transactionContext    transaction context
-     * @param id                    account id
-     * @param amount                amount to deposit
-     * @return                      model of modified account
-     */
-    protected Account deposit(DSLContext transactionContext, BigInteger id, BigDecimal amount) {
-        Account account = getById(transactionContext, id);
-        checkBalanceState(account, amount);
-        return accountDao.changeBalance(transactionContext, id, amount);
-    }
-
-    /**
-     * Withdraws specified amount of money from specified account
-     * @param id        account id
-     * @param amount    amount to withdraw
-     * @return          model of modified account
-     */
-    public Account withdraw(BigInteger id, BigDecimal amount) {
-        return transaction.executeResult(transactionContext -> withdraw(transactionContext, id, amount));
-    }
-
-    /**
-     * Withdraws specified amount of money from specified account within specified transaction
-     * @param transactionContext    transaction context
-     * @param id                    account id
-     * @param amount                amount to withdraw
-     * @return                      model of modified account
-     * @throws                      IllegalArgumentException in case of insufficient account balance
-     */
-    protected Account withdraw(DSLContext transactionContext, BigInteger id, BigDecimal amount) {
-        Account account = getById(transactionContext, id);
-        checkBalanceState(account, amount);
-
-        if (account.getBalance().compareTo(amount) < 0) {
-            throw new IllegalArgumentException(String.format(
-                    "Withdrawing amount (%f) exceeds account balance. " +
-                            "Unable to perform operation on account with id %d.", amount, id));
-        }
-
-        return accountDao.changeBalance(transactionContext, id, amount.negate());
-    }
-
-    /**
-     * Transfer specified amount of money from one account to another
-     * @param request           request model for money transfer
-     * @return                  result model of money transfer
-     * @throws                  IllegalArgumentException in case of different accounts currencies
-     */
-    public TransferResult transfer(TransferRequest request) {
-        return transaction.executeResult(transactionContext -> {
-            Account sourceAccount = withdraw(transactionContext, request.getSourceAccountId(), request.getAmount());
-            Account destinationAccount = deposit(transactionContext, request.getDestinationAccountId(), request.getAmount());
-
-            if (!sourceAccount.getCurrency().equals(destinationAccount.getCurrency())) {
-                throw new IllegalArgumentException(String.format(
-                        "Unable to transfer money between accounts with id %d and %d since they have different " +
-                                "currencies (%s and %s respectively).", sourceAccount.getId(), destinationAccount.getId(),
-                        sourceAccount.getCurrency().toString(), destinationAccount.getCurrency().toString()));
-            }
-
-            return new TransferResult(sourceAccount, destinationAccount);
+            accountDao.changeState(transactionContext, actualAccount.getId(), AccountState.CLOSED);
         });
     }
 
@@ -220,6 +146,20 @@ public class AccountService {
     protected void checkAmountNonNegative(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Unable to perform balance operation with negative amount");
+        }
+    }
+
+    /**
+     * Checks that account, involved in some operation, is the same as stored in DB.
+     * @param accountDescription        description of account involved in some operation
+     * @param actualAccount             actual account
+     * @throws IllegalStateException    in case of non equal accounts
+     */
+    protected void checkAccountChanged(AccountTemplate accountDescription, Account actualAccount) {
+        if (!accountDescription.equals(actualAccount)) {
+            throw new IllegalStateException(
+                    String.format("Account with id \"%d\" has been changed elsewhere. Unable to perform requested operation.",
+                            actualAccount.getId()));
         }
     }
 

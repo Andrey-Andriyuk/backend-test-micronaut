@@ -1,5 +1,6 @@
-package com.andriyuk.backendtest.api.v0_1;
+package com.andriyuk.backendtest.api.v0_1.transfer;
 
+import com.andriyuk.backendtest.api.v0_1.account.Account;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.validation.Validated;
@@ -7,24 +8,23 @@ import io.micronaut.validation.Validated;
 import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
- * Domain model of request for money transfer
+ * Model of money create
  */
 @Immutable
 @Validated
 public class TransferRequest {
 
     /**
-     * Source account id
+     * Source account model
      */
-    private BigInteger sourceAccountId;
+    private Account sourceAccount;
 
     /**
      * Destination account id
      */
-    private BigInteger destinationAccountId;
+    private Account destinationAccount;
 
     /**
      * Transfer amount
@@ -32,22 +32,22 @@ public class TransferRequest {
     private BigDecimal amount;
 
     @JsonCreator
-    public TransferRequest(@JsonProperty("sourceAccountId") BigInteger sourceAccountId,
-                           @JsonProperty("destinationAccountId") BigInteger destinationAccountId,
+    public TransferRequest(@JsonProperty("sourceAccount") Account sourceAccount,
+                           @JsonProperty("destinationAccount") Account destinationAccount,
                            @JsonProperty("amount") BigDecimal amount) {
-        this.sourceAccountId = sourceAccountId;
-        this.destinationAccountId = destinationAccountId;
+        this.sourceAccount = sourceAccount;
+        this.destinationAccount = destinationAccount;
         this.amount = amount;
     }
 
     @NotBlank
-    public BigInteger getSourceAccountId() {
-        return sourceAccountId;
+    public Account getSourceAccount() {
+        return sourceAccount;
     }
 
     @NotBlank
-    public BigInteger getDestinationAccountId() {
-        return destinationAccountId;
+    public Account getDestinationAccount() {
+        return destinationAccount;
     }
 
     @NotBlank

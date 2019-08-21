@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.account.v0_1.service;
+package com.andriyuk.backendtest.account.v0_1.service.transaction;
 
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -17,5 +17,9 @@ public class TransactionTemplate {
 
     public <T> T executeResult(TransactionResultCallback<T> action) {
         return dsl.transactionResult(configuration -> action.doInTransaction(DSL.using(configuration)));
+    }
+
+    public <T> void execute(TransactionCallback action) {
+        dsl.transaction(configuration -> action.doInTransaction(DSL.using(configuration)));
     }
 }

@@ -1,14 +1,15 @@
 package com.andriyuk.backendtest.account.v0_1.controller;
 
-import com.andriyuk.backendtest.api.v0_1.*;
 import com.andriyuk.backendtest.account.v0_1.service.AccountService;
 
-import io.micronaut.http.annotation.Controller;
+import com.andriyuk.backendtest.api.v0_1.account.Account;
+import com.andriyuk.backendtest.api.v0_1.account.AccountOperations;
+import com.andriyuk.backendtest.api.v0_1.account.AccountTemplate;
+import com.andriyuk.backendtest.api.v0_1.transfer.TransferRequest;
 import io.micronaut.validation.Validated;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -33,48 +34,24 @@ public class AccountController implements AccountOperations {
      * {@inheritDoc}
      */
     @Override
-    public Account getById(@NotBlank BigInteger id) {
-        return accountService.getById(id);
+    public Account getById(@NotBlank BigInteger accountId) {
+        return accountService.getById(accountId);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Account add(@NotBlank AccountTemplate accountTemplate) {
-        return accountService.add(accountTemplate);
+    public Account create(@NotBlank AccountTemplate accountTemplate) {
+        return accountService.create(accountTemplate);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Account close(@NotBlank BigInteger id) {
-        return accountService.close(id);
+    public void close(@NotBlank BigInteger accountId) {
+        accountService.close(accountId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Account withdraw(BigInteger id, BigDecimal amount) {
-        return accountService.withdraw(id, amount);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Account deposit(BigInteger id, BigDecimal amount) {
-        return accountService.deposit(id, amount);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TransferResult transfer(TransferRequest transferRequest) {
-        return accountService.transfer(transferRequest);
-    }
 }

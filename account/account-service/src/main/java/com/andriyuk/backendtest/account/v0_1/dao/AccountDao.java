@@ -1,9 +1,9 @@
 package com.andriyuk.backendtest.account.v0_1.dao;
 
-import com.andriyuk.backendtest.api.v0_1.Account;
-import com.andriyuk.backendtest.api.v0_1.AccountState;
-import com.andriyuk.backendtest.api.v0_1.AccountTemplate;
-import com.andriyuk.backendtest.api.v0_1.Currency;
+import com.andriyuk.backendtest.api.v0_1.account.Account;
+import com.andriyuk.backendtest.api.v0_1.account.AccountState;
+import com.andriyuk.backendtest.api.v0_1.account.AccountTemplate;
+import com.andriyuk.backendtest.api.v0_1.account.Currency;
 import com.andriyuk.backendtest.db.jooq.tables.records.AccountRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -41,9 +41,9 @@ public class AccountDao {
     }
 
     /**
-     * Adds a new open account by template within transaction
+     * Adds a new create account by template within transaction
      * @param transactionContext    transaction context
-     * @param accountTemplate       template of account to add
+     * @param accountTemplate       template of account to create
      * @return                      added account model
      */
     public Account add(DSLContext transactionContext, AccountTemplate accountTemplate, AccountState state) {
@@ -59,12 +59,9 @@ public class AccountDao {
      * @param transactionContext    transaction context
      * @param id                    account id
      * @param newBalance            new balance
-     * @return                      model of modified account
      */
-    public Account changeBalance(DSLContext transactionContext, BigInteger id, BigDecimal newBalance) {
+    public void changeBalance(DSLContext transactionContext, BigInteger id, BigDecimal newBalance) {
         transactionContext.update(ACCOUNT).set(ACCOUNT.BALANCE, ACCOUNT.BALANCE.add(newBalance)).where(ACCOUNT.ID.eq(id)).execute();
-        // Since H2 does not support UPDATE ... RETURNING statement, a modified account is requested here (in the context of a transaction)
-        return getById(transactionContext, id);
     }
 
     /**
@@ -72,12 +69,9 @@ public class AccountDao {
      * @param transactionContext    transaction context
      * @param id                    account id
      * @param state                 new account state
-     * @return                      model of modified account
      */
-    public Account changeState(DSLContext transactionContext, BigInteger id, AccountState state) {
+    public void changeState(DSLContext transactionContext, BigInteger id, AccountState state) {
         transactionContext.update(ACCOUNT).set(ACCOUNT.STATE, state.toString()).where(ACCOUNT.ID.eq(id)).execute();
-        // Since H2 does not support UPDATE ... RETURNING statement, a modified account is requested here (in the context of a transaction)
-        return getById(transactionContext, id);
     }
 
     /**
