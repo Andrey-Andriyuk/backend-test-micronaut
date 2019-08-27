@@ -7,7 +7,7 @@ import com.andriyuk.backendtest.api.v0_1.transfer.TransferRequest;
 import javax.inject.Inject;
 
 /**
- * Implementation of create service API
+ * Implementation of transfer service API
  */
 public class TransferController implements TransferOperations {
 

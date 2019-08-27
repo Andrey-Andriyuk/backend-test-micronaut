@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 
 /**
- * Implementation of create service API
+ * Implementation of deposit service API
  */
 @Validated
 public class DepositController implements DepositOperations {
