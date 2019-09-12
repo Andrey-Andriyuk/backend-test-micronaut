@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.api.v0_1;
+package com.andriyuk.backendtest.api.v0_1.account;
 
 import java.util.Random;
 

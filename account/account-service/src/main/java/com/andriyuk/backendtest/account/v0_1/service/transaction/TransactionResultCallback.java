@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.account.service;
+package com.andriyuk.backendtest.account.v0_1.service.transaction;
 
 import org.jooq.DSLContext;
 

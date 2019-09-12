@@ -1,4 +1,4 @@
-package com.andriyuk.backendtest.api.v0_1;
+package com.andriyuk.backendtest.api.v0_1.account;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * Account domain template model
+ * Account template model
  */
 @Immutable
 @Validated
