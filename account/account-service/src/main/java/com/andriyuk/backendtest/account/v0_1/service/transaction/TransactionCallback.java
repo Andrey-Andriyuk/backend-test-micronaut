@@ -7,5 +7,5 @@ import org.jooq.DSLContext;
  */
 @FunctionalInterface
 public interface TransactionCallback {
-    void doInTransaction(DSLContext transactionContext);
+    void doInTransaction(DSLContext transactionContext) throws InterruptedException;
 }

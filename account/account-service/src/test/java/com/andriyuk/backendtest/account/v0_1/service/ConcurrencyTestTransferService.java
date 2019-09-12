@@ -4,6 +4,7 @@ import com.andriyuk.backendtest.api.v0_1.account.BalanceChangeRequest;
 import com.andriyuk.backendtest.api.v0_1.transfer.TransferRequest;
 
 import javax.inject.Singleton;
+import java.math.BigInteger;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -64,5 +65,39 @@ public class ConcurrencyTestTransferService extends TransferService {
         } finally {
             resultLatch.countDown(); //Signals main thread that parallel create operation is completed
         }
+    }
+
+    public void withdrawAndWait(TransferRequest request, CountDownLatch withdrawLatch) {
+        transaction.execute(transactionContext -> {
+            if (!request.getSourceAccount().getCurrency().equals(request.getDestinationAccount().getCurrency())) {
+                throw new IllegalArgumentException(String.format(
+                        "Unable to create money between accounts since they have different " +
+                                "currencies (%s and %s respectively).", request.getSourceAccount().getCurrency().toString(),
+                        request.getDestinationAccount().getCurrency().toString()));
+            }
+
+            BigInteger destAccountId = request.getDestinationAccount().getId();
+            BigInteger sourcAccountId = request.getSourceAccount().getId();
+
+            if (destAccountId.compareTo(sourcAccountId) < 0) {
+                withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
+                        new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+            } else {
+                depositService.create(transactionContext, request.getDestinationAccount().getId(),
+                        new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
+            }
+
+
+//            withdrawLatch.countDown();
+//            withdrawLatch.await();
+
+            if (destAccountId.compareTo(sourcAccountId) < 0) {
+                depositService.create(transactionContext, request.getDestinationAccount().getId(),
+                        new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
+            } else {
+                withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
+                        new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+            }
+        });
     }
 }
