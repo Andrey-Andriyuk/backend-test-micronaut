@@ -6,6 +6,7 @@ import com.andriyuk.backendtest.api.v0_1.transfer.TransferRequest;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigInteger;
 
 /**
  * Transfer service
@@ -37,11 +38,24 @@ public class TransferService {
                         request.getDestinationAccount().getCurrency().toString()));
             }
 
-            withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
-                    new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+            //to avoid deadlocks performing withdraw/deposit operations (and locking of corresponding accounts) in order
+            //of account Id increasing
+            BigInteger destAccountId = request.getDestinationAccount().getId();
+            BigInteger sourcAccountId = request.getSourceAccount().getId();
 
-            depositService.create(transactionContext, request.getDestinationAccount().getId(),
-                    new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
+            if (destAccountId.compareTo(sourcAccountId) < 0) {
+                withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
+                        new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+
+                depositService.create(transactionContext, request.getDestinationAccount().getId(),
+                        new BalanceChangeRequest(request.getDestinationAccount(), request.getAmount()));
+            } else {
+                withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
+                        new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+
+                depositService.create(transactionContext, request.getDestinationAccount().getId(),
+                        new BalanceChangeRequest(request.getDestinationAccount(), request.getAmount()));
+            }
         });
     }
 
