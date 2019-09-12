@@ -8,6 +8,7 @@ import com.andriyuk.backendtest.accountservice.v0_1.service.withdrawal.Withdrawa
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigInteger;
 
 /**
  * Transfer service
@@ -39,11 +40,24 @@ public class TransferCommandService {
                         request.getDestinationAccount().getCurrency().toString()));
             }
 
-            withdrawalCommandService.create(transactionContext, request.getSourceAccount().getId(),
-                    new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+            //to avoid deadlocks performing withdraw/deposit operations (and locking of corresponding accounts) in order
+            //of account Id increasing
+            BigInteger destAccountId = request.getDestinationAccount().getId();
+            BigInteger sourcAccountId = request.getSourceAccount().getId();
 
-            depositCommandService.create(transactionContext, request.getDestinationAccount().getId(),
-                    new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
+            if (destAccountId.compareTo(sourcAccountId) < 0) {
+                withdrawalCommandService.create(transactionContext, request.getSourceAccount().getId(),
+                        new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+
+                depositCommandService.create(transactionContext, request.getDestinationAccount().getId(),
+                        new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
+            } else {
+                depositCommandService.create(transactionContext, request.getDestinationAccount().getId(),
+                        new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
+
+                withdrawalCommandService.create(transactionContext, request.getSourceAccount().getId(),
+                        new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
+            }
         });
     }
 
