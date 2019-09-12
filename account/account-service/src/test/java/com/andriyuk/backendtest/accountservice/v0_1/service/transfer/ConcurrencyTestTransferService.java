@@ -80,10 +80,10 @@ public class ConcurrencyTestTransferService extends TransferCommandService {
             BigInteger sourcAccountId = request.getSourceAccount().getId();
 
             if (destAccountId.compareTo(sourcAccountId) < 0) {
-                withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
+                withdrawalCommandService.create(transactionContext, request.getSourceAccount().getId(),
                         new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
             } else {
-                depositService.create(transactionContext, request.getDestinationAccount().getId(),
+                depositCommandService.create(transactionContext, request.getDestinationAccount().getId(),
                         new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
             }
 
@@ -92,10 +92,10 @@ public class ConcurrencyTestTransferService extends TransferCommandService {
 //            withdrawLatch.await();
 
             if (destAccountId.compareTo(sourcAccountId) < 0) {
-                depositService.create(transactionContext, request.getDestinationAccount().getId(),
+                depositCommandService.create(transactionContext, request.getDestinationAccount().getId(),
                         new BalanceChangeRequest(request.getDestinationAccount(),request.getAmount()));
             } else {
-                withdrawalService.create(transactionContext, request.getSourceAccount().getId(),
+                withdrawalCommandService.create(transactionContext, request.getSourceAccount().getId(),
                         new BalanceChangeRequest(request.getSourceAccount(), request.getAmount()));
             }
         });
